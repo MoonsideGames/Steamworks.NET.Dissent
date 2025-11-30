@@ -208,7 +208,7 @@ namespace Steamworks {
 		internal abstract void SetUnregistered();
 	}
 
-	public sealed class Callback<T> : Callback, IDisposable {
+	public sealed class Callback<T> : Callback, IDisposable where T : unmanaged {
 		public delegate void DispatchDelegate(T param);
 		private event DispatchDelegate m_Func;
 
@@ -286,9 +286,9 @@ namespace Steamworks {
 			return typeof(T);
 		}
 
-		internal override void OnRunCallback(IntPtr pvParam) {
+		internal override unsafe void OnRunCallback(IntPtr pvParam) {
 			try {
-				m_Func((T)Marshal.PtrToStructure(pvParam, typeof(T)));
+				m_Func(*(T*)pvParam);
 			}
 			catch (Exception e) {
 				CallbackDispatcher.ExceptionHandler(e);
